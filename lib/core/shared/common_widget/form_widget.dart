@@ -31,14 +31,9 @@ class CustomFormField extends StatelessWidget {
         if (showtitle)
           Text(
             title,
-            style: blackTextStyle.copyWith(
-              fontSize: 14.sp,
-              fontWeight: medium,
-            ),
+            style: blackTextStyle.copyWith(fontSize: 14.sp, fontWeight: medium),
           ),
-        const SizedBox(
-          height: 8,
-        ),
+        const SizedBox(height: 8),
         TextFormField(
           obscureText: obsecuretext,
           controller: controller,
@@ -46,9 +41,7 @@ class CustomFormField extends StatelessWidget {
           decoration: InputDecoration(
             hintText: !showtitle ? title : null,
             prefixIcon: icon,
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(14),
-            ),
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
             contentPadding: const EdgeInsets.all(12),
           ),
           onFieldSubmitted: onfieldsubmited,

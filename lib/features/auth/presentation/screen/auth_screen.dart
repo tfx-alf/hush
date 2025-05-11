@@ -27,21 +27,14 @@ class AuthScreen extends StatelessWidget {
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                SizedBox(
-                  height: 8.h,
-                ),
+                SizedBox(height: 8.h),
                 Text(
                   'Hostile-Bird Ultimate Security Handler',
-                  style: TextStyle(
-                    fontSize: 16.sp,
-                    color: Colors.grey,
-                  ),
+                  style: TextStyle(fontSize: 16.sp, color: Colors.grey),
                 ),
               ],
             ),
-            SizedBox(
-              height: 24.h,
-            ),
+            SizedBox(height: 24.h),
             Container(
               decoration: BoxDecoration(
                 color: greenColor.withOpacity(0.15),
@@ -59,9 +52,7 @@ class AuthScreen extends StatelessWidget {
                       icon: const Icon(Icons.email),
                       controller: TextEditingController(),
                     ),
-                    SizedBox(
-                      height: 16.h,
-                    ),
+                    SizedBox(height: 16.h),
                     CustomFormField(
                       title: 'Password',
                       obsecuretext: true,
@@ -73,17 +64,13 @@ class AuthScreen extends StatelessWidget {
                 ),
               ),
             ),
-            SizedBox(
-              height: 24.h,
-            ),
+            SizedBox(height: 24.h),
             CustomFilledButton(
               title: 'Login',
               onpressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(
-                    builder: (context) => const HomeScreen(),
-                  ),
+                  MaterialPageRoute(builder: (context) => const HomeScreen()),
                 );
               },
             ),

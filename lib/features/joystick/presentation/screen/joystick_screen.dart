@@ -1,10 +1,97 @@
+import 'dart:convert';
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_webrtc/flutter_webrtc.dart';
+import 'package:http/http.dart' as http;
 import 'package:hush/core/config/theme.dart';
 import 'package:hush/features/setting/presentation/screen/setting_screen.dart';
 
-class JoystickScreen extends StatelessWidget {
+class JoystickScreen extends StatefulWidget {
   const JoystickScreen({super.key});
+
+  @override
+  State<JoystickScreen> createState() => _JoystickScreenState();
+}
+
+class _JoystickScreenState extends State<JoystickScreen> {
+  late RTCPeerConnection _peerConnection;
+  final _remoteRenderer = RTCVideoRenderer();
+
+  @override
+  void initState() {
+    super.initState();
+    initRenderers();
+    _startWebRTC();
+  }
+
+  @override
+  void dispose() {
+    _remoteRenderer.dispose();
+    _peerConnection.close();
+    super.dispose();
+  }
+
+  Future<void> initRenderers() async {
+    await _remoteRenderer.initialize();
+  }
+
+  Future<void> _startWebRTC() async {
+    // Konfigurasi ICE (biasanya pakai STUN/TURN server)
+    final Map<String, dynamic> configuration = {
+      'iceServers': [
+        {'urls': 'stun:stun.l.google.com:19302'},
+      ],
+    };
+
+    final Map<String, dynamic> offerSdpConstraints = {
+      'mandatory': {'OfferToReceiveAudio': true, 'OfferToReceiveVideo': true},
+      'optional': [],
+    };
+
+    _peerConnection = await createPeerConnection(configuration);
+
+    // Setup remote stream
+    _peerConnection.onTrack = (event) {
+      if (event.track.kind == 'video') {
+        _remoteRenderer.srcObject = event.streams[0];
+      }
+    };
+
+    // Buat SDP offer
+    RTCSessionDescription offer = await _peerConnection.createOffer(
+      offerSdpConstraints,
+    );
+    await _peerConnection.setLocalDescription(offer);
+
+    // Kirim offer ke API server
+    final response = await http.post(
+      Uri.parse('http://192.168.1.17:5006/api/v1/offer'),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({
+        "camera_id": "camera01",
+        "sdp": offer.sdp,
+        "type": offer.type,
+      }),
+    );
+
+    log('message response: $response');
+
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> resData = jsonDecode(response.body);
+      final answer = resData['answer'];
+
+      // Set SDP answer dari server
+      RTCSessionDescription remoteDesc = RTCSessionDescription(
+        answer['sdp'],
+        answer['type'],
+      );
+      await _peerConnection.setRemoteDescription(remoteDesc);
+    } else {
+      debugPrint("Failed to get SDP answer: ${response.body}");
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -74,14 +161,7 @@ class JoystickScreen extends StatelessWidget {
               ],
             ),
             SizedBox(height: 16.h),
-            Container(
-              width: double.infinity,
-              height: 225.h,
-              decoration: BoxDecoration(
-                color: greenColor,
-                borderRadius: BorderRadius.circular(12),
-              ),
-            ),
+            // RTCVideoView(_remoteRenderer),
             SizedBox(height: 16.h),
             Row(
               children: [

@@ -3,7 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:hush/core/config/theme.dart';
 import 'package:hush/core/shared/common_widget/button_widget.dart';
 
-Future<void> showAlertDialog(BuildContext context, String textMessage) {
+Future<void> showCustomAlertDialog(BuildContext context, String textMessage) {
   return showDialog(
     context: context,
     barrierDismissible: false,

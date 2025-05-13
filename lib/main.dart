@@ -16,7 +16,7 @@ class MyApp extends StatelessWidget {
       designSize: Size(360, 690),
       minTextAdapt: true,
       splitScreenMode: true,
-      child: MaterialApp(home: UDPReceiverPage()),
+      child: MaterialApp(home: AuthScreen()),
     );
   }
 }

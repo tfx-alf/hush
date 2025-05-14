@@ -39,6 +39,8 @@ dependencies:
   http: ^1.4.0
   flutter_webrtc: ^0.14.0
   udp: ^5.0.3
+  flutter_joystick: ^0.2.2
+  web_socket_channel: ^3.0.3
 
 dev_dependencies:
   flutter_test:

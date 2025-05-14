@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:hush/core/config/theme.dart';
+import 'package:hush/core/shared/common_widget/button_widget.dart';
 import 'package:hush/features/joystick/presentation/screen/joystick_screen.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -32,9 +33,9 @@ class HomeScreen extends StatelessWidget {
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      const Text(
+                      Text(
                         '2 Client Connected',
-                        style: TextStyle(fontSize: 16, color: Colors.grey),
+                        style: TextStyle(fontSize: 16, color: greenColor),
                       ),
                     ],
                   ),
@@ -85,11 +86,11 @@ class HomeScreen extends StatelessWidget {
                                         fontWeight: FontWeight.bold,
                                       ),
                                     ),
-                                    const Text(
+                                    Text(
                                       'Device Connected',
                                       style: TextStyle(
                                         fontSize: 16,
-                                        color: Colors.grey,
+                                        color: greenColor,
                                       ),
                                     ),
                                   ],
@@ -110,6 +111,15 @@ class HomeScreen extends StatelessWidget {
                     );
                   },
                 ),
+              ),
+              CustomFilledButton(
+                title: 'Sync Device',
+                onpressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const HomeScreen()),
+                  );
+                },
               ),
             ],
           ),

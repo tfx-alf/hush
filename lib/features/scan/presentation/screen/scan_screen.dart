@@ -5,6 +5,10 @@ import 'dart:io';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_webrtc/flutter_webrtc.dart';
+import 'package:hush/core/config/theme.dart';
+import 'package:hush/core/shared/common_widget/button_widget.dart';
+import 'package:hush/features/home/presentation/screen/home_screen.dart';
 
 class UDPReceiverPage extends StatefulWidget {
   const UDPReceiverPage({super.key});
@@ -18,9 +22,17 @@ class _UDPReceiverPageState extends State<UDPReceiverPage> {
   bool isServerConnected = false;
   List<Device> devices = [];
 
+  @override
+  void initState() {
+    super.initState();
+    _reciveUDP();
+  }
+
   void _reciveUDP() async {
-    final RawDatagramSocket socket =
-        await RawDatagramSocket.bind(InternetAddress.anyIPv4, 15005);
+    final RawDatagramSocket socket = await RawDatagramSocket.bind(
+      InternetAddress.anyIPv4,
+      15005,
+    );
     socket.broadcastEnabled = true;
 
     // Send discovery packet to the network
@@ -46,9 +58,10 @@ class _UDPReceiverPageState extends State<UDPReceiverPage> {
             setState(() {
               isServerConnected = true;
               status = "✅ Server connected!";
-              devices = (response['devices'] as List)
-                  .map((device) => Device.fromJson(device))
-                  .toList();
+              devices =
+                  (response['devices'] as List)
+                      .map((device) => Device.fromJson(device))
+                      .toList();
             });
             for (final device in devices) {
               log("✅ Device Found:");
@@ -60,14 +73,36 @@ class _UDPReceiverPageState extends State<UDPReceiverPage> {
             }
           }
         } catch (e) {
+          showDialog(
+            context: context,
+            barrierDismissible: false,
+            useSafeArea: true,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                title: Center(
+                  child: Text(
+                    'You’re Not Connected to a Wifi',
+                    textAlign: TextAlign.center,
+                    style: blackTextStyle.copyWith(
+                      fontSize: 16.sp,
+                      fontWeight: black,
+                    ),
+                  ),
+                ),
+                content: Icon(Icons.wifi_off, size: 70.h),
+                actions: [
+                  CustomFilledButton(
+                    title: 'OK',
+                    onpressed: () => Navigator.pop(context),
+                  ),
+                ],
+              );
+            },
+          );
           log("❌ Failed to parse response: $e");
         }
       }
     });
-
-    // Optional timeout
-    // await Future.delayed(Duration(seconds: 5));
-    // socket.close();
   }
 
   @override
@@ -92,49 +127,56 @@ class _UDPReceiverPageState extends State<UDPReceiverPage> {
                   SizedBox(height: 4.h),
                   Text(
                     'Hostile-Bird Ultimate Security Handler',
-                    style: TextStyle(
-                      fontSize: 16.sp,
-                      color: Colors.grey,
-                    ),
+                    style: TextStyle(fontSize: 16.sp, color: Colors.grey),
                   ),
                 ],
               ),
               const SizedBox(height: 16),
               Expanded(
-                child: devices.isEmpty
-                    ? Text(
-                        status,
-                        style: TextStyle(
-                          fontSize: 14.sp,
-                          color: isServerConnected ? Colors.green : Colors.red,
-                        ),
-                      )
-                    : ListView.builder(
-                        itemCount: devices.length,
-                        itemBuilder: (context, index) {
-                          final device = devices[index];
-                          return Card(
-                            child: ListTile(
-                              title: Text(device.deviceId),
-                              subtitle: Text(
-                                "IP: ${device.ip}, Port: ${device.port}",
+                child:
+                    devices.isEmpty
+                        ? Text(
+                          status,
+                          style: TextStyle(
+                            fontSize: 14.sp,
+                            color:
+                                isServerConnected ? Colors.green : Colors.red,
+                          ),
+                        )
+                        : ListView.builder(
+                          itemCount: devices.length,
+                          itemBuilder: (context, index) {
+                            final device = devices[index];
+                            return Card(
+                              child: InkWell(
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => HomeScreen(),
+                                    ),
+                                  );
+                                },
+                                child: ListTile(
+                                  title: Text(device.deviceId),
+                                  subtitle: Text(
+                                    "IP: ${device.ip}, Port: ${device.port}",
+                                  ),
+                                  trailing: Text(device.type),
+                                ),
                               ),
-                              trailing: Text(device.type),
-                            ),
-                          );
-                        },
-                      ),
+                            );
+                          },
+                        ),
               ),
-              FilledButton(
-                onPressed: () {
-                  setState(() {
-                    status = "⏳ Memuat ulang...";
-                    isServerConnected = false;
-                    devices.clear();
-                  });
-                  _reciveUDP();
+              CustomFilledButton(
+                title: 'Refresh',
+                onpressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const HomeScreen()),
+                  );
                 },
-                child: const Text('Reload'),
               ),
             ],
           ),

@@ -11,13 +11,18 @@ class SettingScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: whiteColor,
-
         elevation: 0.0,
         automaticallyImplyLeading: false,
         title: const Text(
           'Parameter Setting',
           style: TextStyle(fontFamily: 'Montserrat'),
         ),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.refresh, color: greenColor),
+            onPressed: () {},
+          ),
+        ],
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios),
           onPressed: () {
